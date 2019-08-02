@@ -4,6 +4,8 @@ Carro do jogo Top Gear inspirado na Ferrari 288 GTO de 1985, se destaca pelo men
 # How to run
 
 - Clonar o repositório;
+- Alterar o arquivo config.php para os dados do seu banco;
+- Na pasta "uteis" do projeto, utilizar o arquivo chamado createDB.sql para preparar seu banco de dados;
 - No arquivo httpd.conf, alterar o "DocumentRoot" para a recém-clonada pasta sidewinder;
 - Iniciar o apache;
 - Abrir no navegador o arquivo index.php na raíz do projeto.
