@@ -1,22 +1,23 @@
 <?php 
+    require_once ('./view/index.html');
     include_once 'config.php';
     $dbcon = new mysqli($hostname, $username, $password, $db);
 
-    $table = '
-        <table>
+    $table = '<legend align="center">Classificação</legend>
+        <table align="center" class="table table-bordered">
             <tr>
-                <th>Posição chegada</th>
-                <th>Nome Piloto</th>
+                <th align="center">Posição chegada</th>
+                <th align="center">Nome Piloto</th>
             </tr>';
     
-    $html = '
-        <table>
+    $html = '<legend align="center">Resultados</legend>
+        <table align="center" class="table table-bordered">
             <tr> 
-                <th>Código Piloto</th> 
-                <th>Nome Piloto</th>
-                <th>Qtde Voltas Completadas</th>
-                <th>Melhor volta</th>
-                <th>Velocidade média</th>
+                <th align="center">Código Piloto</th> 
+                <th align="center">Nome Piloto</th>
+                <th align="center">Qtde Voltas Completadas</th>
+                <th align="center">Melhor volta</th>
+                <th align="center">Velocidade média</th>
             </tr>';
     
     // Ranking
@@ -53,7 +54,7 @@
         $count += 1;
         $table .= '
         <tr>
-            <td align="center">'. $count .'</td>
+            <td align="center">'. $count .'º lugar</td>
             <td align="center">'. $chegada['piloto'] .'</td>
         </tr>';
     }
@@ -63,11 +64,17 @@
     $select = "SELECT MIN(tempoVolta) AS tempo, nVolta, piloto FROM teste_php.corrida;";
     $result = mysqli_query($dbcon, $select);       
     $result_line = mysqli_fetch_array($result);
+    $tempo = $result_line[0];
+    $volta = $result_line[1];
+    $piloto = $result_line[2];
+    $tempo_slpit = explode(":", $tempo);
+    
 
     // Duração da corrida
     $select_time = "SELECT SEC_TO_TIME(SUM(TIME_TO_SEC(tempoVolta))) AS tempo_total FROM teste_php.corrida;";
     $result_time = mysqli_query($dbcon, $select_time);       
     $time_row = mysqli_fetch_array($result_time);
+    $time_split = explode(":", $time_row[0]);
 
     // Indicadores pilotos
     $query_select = "
@@ -75,7 +82,7 @@
             codPiloto, 
             piloto, 
             COUNT(nVolta) AS qtd_voltas,
-            CONCAT(min(tempoVolta), ' - ', nVolta) AS melhor_volta,
+            CONCAT(min(tempoVolta), ' - ', nVolta, 'ª volta') AS melhor_volta,
             (SUM(VelocidadeMediaDaVolta) / COUNT(nVolta)) AS velocidade_media_piloto
         FROM 
             teste_php.corrida
@@ -97,7 +104,7 @@
                 <td align="center">'. stripcslashes($row['piloto'])  .'</td>
                 <td align="center">'. $row['qtd_voltas']  .'</td>
                 <td align="center">'. $row['melhor_volta'] .'</td>
-                <td align="center">'. number_format($row['velocidade_media_piloto'], 2, '.', '') .'</td>
+                <td align="center">'. number_format($row['velocidade_media_piloto'], 2, '.', '') .' km/h</td>
             </tr>';
     }
 
@@ -108,24 +115,30 @@
         </tr>
     </table>';
 
-    $html .= '
-        </table>
-        <style>
-            table {
-                border-collapse: collapse;
-            }
-    
-            table, th, td {
-                border: 1px solid black;
-            }
-        </style>';
+    $html .= '</table>';
 
     $html .= '<br><br>';  
     
-    $html .= '<h3>Melhor volta da corrida: '. $result_line[2] .' - Volta '. $result_line[1] .' - Tempo '. $result_line[0] .'</h3>'; 
-    $html .= '<br>'; 
-    $html .= '<h3>Tempo Total de Prova: '. $time_row[0] .' minutos</h3>';
+    $html1 = '
+    <fieldset>
+        <legend class="lg">Melhor volta</legend>
+        <i class="lg ft fas fa-stopwatch"></i> '. $tempo_slpit[0] .' minuto(s) e '. $tempo_slpit[1] .' segundo(s)
+        <i class="lg ft fas fa-male"></i> '. $piloto .'
+        <i class="lg ft fas fa-flag-checkered"></i> '. $volta .'ª volta
+    </fieldset>
+    ';
+    
+    $html2 = '
+    <fieldset>
+        <legend class="lg">Duração da prova</legend>
+        <i class="lg ft far fa-clock"></i> '. $time_split[0] .' minuto(s) e '. $time_split[1] .' segundo(s)
+    </fieldset>
+    '; 
 
+    echo $html1;
+    echo "<br>";
+    echo $html2;
+    echo "<br>";
     echo $table;
     echo "<br>";
     echo $html;
